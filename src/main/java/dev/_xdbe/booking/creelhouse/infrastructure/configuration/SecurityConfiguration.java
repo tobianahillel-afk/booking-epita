@@ -41,13 +41,13 @@ public class SecurityConfiguration {
     public UserDetailsService userDetailsService() {
         UserDetails administrator = User.builder()
             .username("admin")
-            .password("{bcrypt}$2b$10$sRxMf0HwPCXBWLrKuCt.XeKyQ0nJqkOccuuR90B9lx3iykO3k28em")
+            .password("{bcrypt}$2b$10$d5BGL7urxl3402AQJJ5CYu6ORWQilg/InmcPNcoO0rjm3ZWf0NKGa")
             .roles("ADMIN")
             .build();
 
         UserDetails guest = User.builder()
             .username("guest")
-            .password("{bcrypt}$2b$10$v3w4F4vEid3VsLVP1kLB4eKwiCsIRl/zUPijaNg4ycWGGuMxpta66")
+            .password("{bcrypt}$2b$10$d5BGL7urxl3402AQJJ5CYu6ORWQilg/InmcPNcoO0rjm3ZWf0NKGa")
             .roles("GUEST")
             .build();
 
