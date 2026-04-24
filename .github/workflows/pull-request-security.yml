@@ -59,26 +59,21 @@ jobs:
           retention-days: 5
 
   source-code-analysis:
-    name: add source code analysis
+    name: Add source code analysis
     runs-on: ubuntu-latest
     container:
-      image: returntocorp/semgrep@sha256:0a014c440663e466a79401c24e0cc8c63e18975cd9eb82dca62d0826b41a359a
+      image: returntocorp/semgrep
     steps:
       - name: checkout source
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
 
-      - name: calculate baseline commit
-        id: baseline
-        run: |
-          echo "sha=$(git merge-base HEAD ${{ github.event.pull_request.base.sha }})" >> "$GITHUB_OUTPUT"
-
       - name: run semgrep differential analysis
         run: |
           semgrep scan \
             --config .semgrep \
-            --baseline-commit "${{ steps.baseline.outputs.sha }}" \
+            --baseline-commit "${{ github.event.pull_request.base.sha }}" \
             --sarif \
             --output SourceCodeAnalysisDiff.sarif \
             --error \
