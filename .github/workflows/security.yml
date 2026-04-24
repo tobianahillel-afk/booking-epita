@@ -1,0 +1,55 @@
+name: security
+
+on:
+  workflow_dispatch:
+
+permissions:
+
+  actions: read
+
+  security-events: write
+
+  contents: read
+
+jobs:
+  dependencies-analysis:
+    name: Dependencies Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: run osv-scanner
+        uses: google/osv-scanner-action/osv-scanner-action@c51854704019a247608d928f370c98740469d4b5
+        with:
+          scan-args: |-
+            --format sarif
+            --output DependenciesAnalysisFull.sarif
+            ./
+        continue-on-error: true
+
+      - name: upload dependency SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225
+        with:
+          sarif_file: DependenciesAnalysisFull.sarif
+          category: dependencies-analysis
+
+  source-code-analysis:
+    name: SourceCodeAnalysis
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep@sha256:0a014c440663e466a79401c24e0cc8c63e18975cd9eb82dca62d0826b41a359a
+    steps:
+      - name: checkout source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: run semgrep
+        run: semgrep scan --config .semgrep --sarif --output SourceCodeAnalysis.sarif .
+
+      - name: upload source code SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225
+        with:
+          sarif_file: SourceCodeAnalysis.sarif
+          category: source-code-analysis
